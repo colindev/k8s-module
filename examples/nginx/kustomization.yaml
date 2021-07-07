@@ -6,7 +6,7 @@ commonLabels:
   app: nginx
 
 bases:
-- github.com/colindev//nginx/deployment
+  - https://github.com/colindev/k8s-module/nginx/deployment
 
 patches:
 - patch.yaml
