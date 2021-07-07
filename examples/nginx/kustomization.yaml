@@ -1,0 +1,33 @@
+kind: Kustomization
+
+namespace: default
+
+commonLabels:
+  app: nginx
+
+bases:
+- github.com/colindev//nginx/deployment
+
+patches:
+- patch.yaml
+
+resources:
+- svc.yaml
+
+configMapGenerator:
+- name: nginx
+  files:
+  - nginx.conf=etc/nginx/nginx.conf
+- name: html
+  files:
+  - index.html=usr/share/nginx/html/index.html
+
+secretGenerator:
+- name: ssl
+  files:
+  - cert.pem=ssl/cert.pem
+  - key.pem=ssl/key.pem
+
+images:
+- name: nginx
+  newTag: 1.21.1-alpine
