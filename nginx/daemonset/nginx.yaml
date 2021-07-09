@@ -11,6 +11,13 @@ spec:
         image: nginx:alpine
         ports:
         - containerPort: 80
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /usr/sbin/nginx
+              - -s
+              - quit
         readinessProbe:
           httpGet:
             scheme: HTTPS

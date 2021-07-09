@@ -10,8 +10,8 @@ spec:
     port: 443
     targetPort: 443
   type: LoadBalancer
-  clusterIP:
+  clusterIP: 
   loadBalancerIP:
   loadBalancerSourceRanges:
-  - 59.126.155.55/32
+  - 0.0.0.0/0
   externalTrafficPolicy: Local
