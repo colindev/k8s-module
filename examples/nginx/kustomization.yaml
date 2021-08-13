@@ -1,12 +1,12 @@
 kind: Kustomization
 
-namespace: default
+namespace: test
 
 commonLabels:
   app: nginx
 
 bases:
-  - https://github.com/colindev/k8s-module/nginx/deployment
+- https://github.com/colindev/k8s-module/nginx/deployment
 
 patches:
 - patch.yaml

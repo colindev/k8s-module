@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-fpm
+spec:
+  template:
+    spec:
+      terminationGracePeriodSeconds: 120
+      containers:
+      - name: php-fpm
+        image: php:fpm-alpine
+        ports:
+        - containerPort: 9000
+        resources:
+          requests:
+            cpu: 250m
+            ephemeral-storage: 1Gi
+            memory: 512Mi
+

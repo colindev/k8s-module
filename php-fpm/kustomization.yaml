@@ -1,0 +1,8 @@
+kind: Kustomization
+
+commonLabels:
+  app: php-fpm
+
+resources:
+- php-fpm.yaml
+- svc.yaml

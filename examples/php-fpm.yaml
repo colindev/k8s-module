@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-fpm
+spec:
+  template:
+    spec:
+      terminationGracePeriodSeconds: 120
+      containers:
+      - name: php-fpm
+        volumeMounts:
+        - name: php
+          mountPath: /var/www/html
+          readOnly: true
+      volumes:
+      - name: php
+        configMap:
+          name: php

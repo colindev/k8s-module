@@ -20,17 +20,17 @@ spec:
               - quit
         readinessProbe:
           httpGet:
-            scheme: HTTPS
+            scheme: HTTP
             path: /healthz
-            port: 443
+            port: 80
           initialDelaySeconds: 5
           periodSeconds: 5
           failureThreshold: 3
         livenessProbe:
           httpGet:
-            scheme: HTTPS
+            scheme: HTTP
             path: /healthz
-            port: 443
+            port: 80
           initialDelaySeconds: 20
           periodSeconds: 10
           failureThreshold: 1
@@ -38,3 +38,4 @@ spec:
           requests:
             cpu: 10m
             memory: 30Mi
+            ephemeral-storage: 100Mi

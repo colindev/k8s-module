@@ -1,0 +1,19 @@
+kind: Kustomization
+
+namespace: test
+
+bases:
+- ../php-fpm
+- ./nginx
+
+patches:
+- php-fpm.yaml
+
+configMapGenerator:
+- name: nginx
+  behavior: replace
+  files:
+  - nginx.conf
+- name: php
+  files:
+  - phpinfo.php
