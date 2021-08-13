@@ -6,12 +6,17 @@ spec:
   selector:
     app: nginx
   ports:
-  - protocol: TCP
+  - name: https
+    protocol: TCP
     port: 443
     targetPort: 443
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
   type: LoadBalancer
   clusterIP: 
-  loadBalancerIP:
+  loadBalancerIP: 
   loadBalancerSourceRanges:
   - 0.0.0.0/0
   # deployment

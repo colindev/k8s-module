@@ -11,6 +11,12 @@ spec:
         image: php:fpm-alpine
         ports:
         - containerPort: 9000
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - pkill
+              - php-fpm
         resources:
           requests:
             cpu: 250m
