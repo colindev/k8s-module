@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: envoy-proxy
+spec:
+  template:
+    spec:
+      containers:
+      - name: envoy
+        image: envoyproxy/envoy-alpine:v1.21-latest
+        volumeMounts:
+        - mountPath: /etc/envoy/envoy.yaml
+          subPath: envoy.yaml
+          name: envoy
+      volumes:
+      - name: envoy
+        configMap:
+          name: envoy

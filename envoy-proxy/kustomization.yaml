@@ -1,0 +1,13 @@
+kind: Kustomization
+
+commonLabels:
+  app: envoy-proxy
+
+resources:
+- deploy.yaml
+- svc.yaml
+
+configMapGenerator:
+- name: envoy
+  files:
+  - conf/envoy.yaml
