@@ -1,30 +1,88 @@
+admin:
+  access_log_path: /dev/stdout
+  address:
+    socket_address:
+      address: 127.0.0.1
+      port_value: 9901
 static_resources:
   listeners:
   - name: http
     address:
       socket_address:
         address: 0.0.0.0
-        port_value: 80
+        # https://github.com/envoyproxy/envoy/pull/11323/files#diff-0a28444aed63c8bca0aca8c90ae29320f1a416df258d08ac573416db5570a387
+        # 如果要跑在1024 port 以下, 設定$ENVOY_UID = 0
+        port_value: 8000
     filter_chains:
       - filters:
         - name: envoy.filters.network.http_connection_manager
           typed_config:
             "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
             stat_prefix: ingress_http
+            codec_type: AUTO # AUTO (default) / HTTP1 / HTTP2
             
             access_log:
-            - name: envoy.access_loggers.stdout
+            - name: envoy.access_loggers.stream
               typed_config:
                 "@type": type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog
             
-            http_filters:
+            http_filters: # 陣列順序很重要
+
+            # https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/lua_filter#config-http-filters-lua-stream-handle-api
+            - name: envoy.filters.http.lua
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+                inline_code: |
+                  function envoy_on_request(request_handle)
+                    request_handle:logInfo("lua test request")
+                  end
+                  
+                  function envoy_on_response(response_handle)
+                    response_handle:logInfo("lua test response")
+                  end
+
+            # https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/router/v3/router.proto#extension-envoy-filters-http-router
+            # must be the last filter in a http filter chain
             - name: envoy.filters.http.router
               typed_config:
                 "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+                #dynamic_stats: {...}
+                #start_child_span: "..."
+                #upstream_log: []
+                #suppress_envoy_headers: "..."
+                #strict_check_headers: []
+                #respect_expected_rq_timeout: "..."
+                #suppress_grpc_request_failure_code_stats: "..."
             
             route_config:
               name: echo
+              max_direct_response_body_size_bytes: 8192
+              internal_only_headers: X-Colin # 從外部注入會被移除
+              response_headers_to_remove:
+              - access-control-allow-origin
+              - Server
+              - Via
               virtual_hosts:
+              - name: echo-headers-modify
+                domains:
+                - "abc.xxx.xom"
+                response_headers_to_add:
+                - header:
+                    key: Out
+                    value: ok
+                  append: "true"
+                request_headers_to_add:
+                - header:
+                    key: In
+                    value: ok
+                  append: true
+                routes:
+                - match:
+                    prefix: "/"
+                  route:
+                    host_rewrite_literal: echo.colindev.io
+                    cluster: echo
+
               - name: echo
                 domains:
                 - "*"
@@ -38,7 +96,9 @@ static_resources:
   clusters:
   - name: echo
     type: LOGICAL_DNS
+    connect_timeout: 30s
     dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
     load_assignment:
       cluster_name: echo_cloud_run
       endpoints:

@@ -8,6 +8,15 @@ spec:
       containers:
       - name: envoy
         image: envoyproxy/envoy-alpine:v1.21-latest
+        env:
+        # # [trace][debug][info(default)][warning|warn][error][critical][off]
+        - name: loglevel 
+          value: info
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        - containerPort: 10443
+        - containerPort: 9901 # admin
         volumeMounts:
         - mountPath: /etc/envoy/envoy.yaml
           subPath: envoy.yaml
